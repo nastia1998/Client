@@ -2,35 +2,27 @@ import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios';
+import TodoItem from './components/TodoItem'
 
-import ContactList from './components/ContactList';
 
 class App extends Component{
 
     state = {
-      contacts: []
+        todoList: [],
+        loading: false,
+        error: ""
     };
 
-    componentDidMount() {
-        axios
-            .get('https://jsonplaceholder.typicode.com/users')
-            .then (response => {
+    async componentDidMount() {
+        try {
+            this.setState({loading: true})
+            const { data } = await axios.get("https://localhost:44390/api/todolists")
 
-                const newContacts = response.data.map(c => {
-                    return {
-                        id: c.id,
-                        name: c.name
-                    };
-                });
-
-                const newState = Object.assign({}, this.state, {
-                    contacts: newContacts
-                });
-
-                this.setState(newState);
-
-            })
-            .catch(error => console.log(error));
+            this.setState({todoList: data, loading: false})
+        } catch (e) {
+            console.log(e)
+            this.setState({error: e.message, loading: false})
+        }
     }
 
     render() {
@@ -39,9 +31,10 @@ class App extends Component{
                 <header className="App-header">
                     <img src={logo} className="App-logo" alt="logo" />
                     <p>Welcome to our To do list</p>
+                    {this.state.loading ? <div>Loading...</div> : null}
+                    {this.state.error ? <div>{this.state.error}</div> : null}
+                    {this.state.todoList.map(item => <TodoItem key={item.id} item={item}/>)}
                 </header>
-
-                <ContactList contacts={this.state.contacts}/>
             </div>
         );
     }
