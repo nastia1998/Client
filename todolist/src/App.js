@@ -1,41 +1,57 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import { browserHistory } from 'react-router';
 import axios from 'axios';
-import TodoItem from './components/TodoItem'
 
+import HomePage from './components/HomePage';
+import NavBar from './components/NavBar';
+import Login from './components/Login';
+import Register from './components/Register';
+import TodoList from './components/TodoList';
 
 class App extends Component{
 
     state = {
-        todoList: [],
-        loading: false,
-        error: ""
+        todolists: []
     };
 
-    async componentDidMount() {
-        try {
-            this.setState({loading: true})
-            const { data } = await axios.get("https://localhost:44390/api/todolists")
+    componentDidMount() {
+        axios
+            .get('https://localhost:44390/api/todolists')
+            .then(response => {
 
-            this.setState({todoList: data, loading: false})
-        } catch (e) {
-            console.log(e)
-            this.setState({error: e.message, loading: false})
-        }
+                const newTodoLists = response.data.map(c => {
+                    return {
+                        id: c.id,
+                        name: c.name,
+                        description: c.description
+                    };
+                });
+
+                const newState = Object.assign({}, this.state, {
+                    todolists: newTodoLists
+                });
+
+                this.setState(newState);
+
+            })
+            .catch(error => console.log(error));
     }
 
     render() {
         return (
-            <div className="App">
-                <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <p>Welcome to our To do list</p>
-                    {this.state.loading ? <div>Loading...</div> : null}
-                    {this.state.error ? <div>{this.state.error}</div> : null}
-                    {this.state.todoList.map(item => <TodoItem key={item.id} item={item}/>)}
-                </header>
-            </div>
+            <Router>
+                <div>
+                    <NavBar />
+                    <Route name='home' exact path='/' component={HomePage} />
+                    <Route name='login' exact path='/login' component={Login} />
+                    <Route name='register' exact path='/register' component={Register} />
+                    <Route name='todolists'
+                           exact path='/todolists'
+                           render={(props) => <TodoList todolists={this.state.todolists} />} />
+                </div>
+            </Router>
         );
     }
 }
