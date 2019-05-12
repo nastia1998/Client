@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import axios from "axios";
 
-import TodoItem from './TodoItem';
 import TaskList from './TaskList';
+import '../styles/TodoList.css'
 
 class TodoList extends Component {
 
@@ -14,11 +14,18 @@ class TodoList extends Component {
         this.state = {
             modal: false,
             listId: 0,
-            namelist: '',
-            tasks: []
+            tasks: [],
+            nameVal: '',
+            descrVal: ''
         };
 
         this.toggle = this.toggle.bind(this);
+
+        this.toggleButton = this.toggleButton.bind(this);
+        this.updateInputName = this.updateInputName.bind(this);
+        this.updateInputDescr = this.updateInputDescr.bind(this);
+
+        this.deleteItem = this.deleteItem.bind(this);
     }
 
     async componentDidMount() {
@@ -48,15 +55,56 @@ class TodoList extends Component {
 
     }
 
+    updateInputName(event) {
+        this.setState({nameVal: event.target.value})
+    }
+
+    updateInputDescr(event) {
+        this.setState({descrVal: event.target.value})
+    }
+
+    toggleButton(event) {
+
+        axios
+            .post("https://localhost:44390/api/todolists", {
+                userId: 1,
+                name: this.state.nameVal,
+                description: this.state.descrVal
+            })
+            .then(response => {
+                console.log(response)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+
+    }
+
+    deleteItem(event) {
+
+        this.setState({listId: event.target.id}, () => {
+            axios
+                .delete(`https://localhost:44390/api/todolists/${this.state.listId}`)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        })
+
+    }
+
     render() {
         return (
             <div>
-                <div>
+                <div className="lists">
                     { this.props.todolists.map(c =>
                         <p key={c.id}>
                             <Button onClick={this.toggle}>
                                 <div id={c.id} name={c.name}> {c.id} {c.name} {c.description} </div>
                             </Button>
+                            <Button id={c.id} color="danger" onClick={this.deleteItem}> X </Button>
                         </p>
                         )
                     }
@@ -75,8 +123,9 @@ class TodoList extends Component {
                 </div>
                 <hr />
                 <div>
-                    <Button outline color="primary">Add</Button><input type="text" /><input type="text" /><br />
-                    <Button outline color="primary">Delete</Button>
+                    <input type="text" onChange={this.updateInputName} /><br />
+                    <input type="text" onChange={this.updateInputDescr} /><br />
+                    <Button outline color="primary" onClick={this.toggleButton}>Add</Button>
                 </div>
             </div>
         );
