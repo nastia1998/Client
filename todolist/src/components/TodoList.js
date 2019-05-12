@@ -10,8 +10,10 @@ class TodoList extends Component {
     constructor(props) {
 
         super(props);
+
         this.state = {
             modal: false,
+            listId: 0,
             namelist: '',
             tasks: []
         };
@@ -19,33 +21,31 @@ class TodoList extends Component {
         this.toggle = this.toggle.bind(this);
     }
 
-    componentDidMount() {
-        axios
-            .get('https://localhost:44390/api/todolists/2/tasks')
-            .then(response => {
+    async componentDidMount() {
 
-                const newTasks = response.data.map(c => {
-                    return {
-                        id: c.id,
-                        name: c.name,
-                        description: c.description
-                    };
-                });
+        try {
+            if (this.state.listId !== 0 && this.state.listId !== null && this.state.listId !== '') {
+                const {data} = await axios.get(`https://localhost:44390/api/todolists/${this.state.listId}/tasks`)
+                this.setState({tasks: data})
+            }
+        } catch (e) {
+            console.log(e)
+            this.setState({error: e.message})
+        }
 
-                const newState = Object.assign({}, this.state, {
-                    tasks: newTasks
-                });
-
-                this.setState(newState);
-
-            })
-            .catch(error => console.log(error));
     }
 
-    toggle() {
-        this.setState(prevState => ({
+    toggle(event) {
+
+        this.setState({listId: event.target.id}, () => {
+            console.log('ty', this.state.listId)
+            this.componentDidMount()
+        })
+
+        this.setState((prevState) => ({
             modal: !prevState.modal
         }));
+
     }
 
     render() {
@@ -53,13 +53,15 @@ class TodoList extends Component {
             <div>
                 <div>
                     { this.props.todolists.map(c =>
-                        <Button key={c.id} onClick={this.toggle}>
-                            <TodoItem name={c.name} description={c.description} />
-                        </Button>
+                        <p key={c.id}>
+                            <Button onClick={this.toggle}>
+                                <div id={c.id} name={c.name}> {c.id} {c.name} {c.description} </div>
+                            </Button>
+                        </p>
                         )
                     }
-                    <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                        <ModalHeader toggle={this.toggle}>{this.state.namelist}</ModalHeader>
+                    <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} tasks={this.state.tasks}>
+                        <ModalHeader toggle={this.toggle}>Tasks</ModalHeader>
                         <ModalBody>
                             <div>
                                 <TaskList tasks={this.state.tasks} />

@@ -12,30 +12,19 @@ import TodoList from './components/TodoList';
 class App extends Component{
 
     state = {
-        todolists: []
+        todoList: []
     };
 
-    componentDidMount() {
-        axios
-            .get('https://localhost:44390/api/todolists')
-            .then(response => {
+    async componentDidMount() {
 
-                const newTodoLists = response.data.map(c => {
-                    return {
-                        id: c.id,
-                        name: c.name,
-                        description: c.description
-                    };
-                });
+        try {
+            const { data } = await axios.get("https://localhost:44390/api/todolists");
+            this.setState({todoList: data});
+        } catch (e) {
+            console.log(e)
+            this.setState({error: e.message})
+        }
 
-                const newState = Object.assign({}, this.state, {
-                    todolists: newTodoLists
-                });
-
-                this.setState(newState);
-
-            })
-            .catch(error => console.log(error));
     }
 
     render() {
@@ -48,7 +37,7 @@ class App extends Component{
                     <Route name='register' exact path='/register' component={Register} />
                     <Route name='todolists'
                            exact path='/todolists'
-                           render={(props) => <TodoList todolists={this.state.todolists} />} />
+                           render={(props) => <TodoList todolists={this.state.todoList} />} />
                 </div>
             </Router>
         );
