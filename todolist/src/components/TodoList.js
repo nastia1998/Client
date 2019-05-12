@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import axios from "axios";
 
@@ -104,7 +104,7 @@ class TodoList extends Component {
                             <Button onClick={this.toggle}>
                                 <div id={c.id} name={c.name}> {c.id} {c.name} {c.description} </div>
                             </Button>
-                            <Button id={c.id} color="danger" onClick={this.deleteItem}> X </Button>
+                            <Button outline id={c.id} color="danger" onClick={this.deleteItem}> X </Button>
                         </p>
                         )
                     }
@@ -112,7 +112,7 @@ class TodoList extends Component {
                         <ModalHeader toggle={this.toggle}>Tasks</ModalHeader>
                         <ModalBody>
                             <div>
-                                <TaskList tasks={this.state.tasks} />
+                                <TaskList listId={this.state.listId} tasks={this.state.tasks} />
                             </div>
                         </ModalBody>
                         <ModalFooter>
@@ -122,9 +122,9 @@ class TodoList extends Component {
                     </Modal>
                 </div>
                 <hr />
-                <div>
-                    <input type="text" onChange={this.updateInputName} /><br />
-                    <input type="text" onChange={this.updateInputDescr} /><br />
+                <div className="lists">
+                    <label>Name</label> <input type="text" onChange={this.updateInputName} /><br />
+                    <label>Description</label> <input type="text" onChange={this.updateInputDescr} /><br />
                     <Button outline color="primary" onClick={this.toggleButton}>Add</Button>
                 </div>
             </div>
