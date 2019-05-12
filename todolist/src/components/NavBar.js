@@ -35,14 +35,6 @@ class NavBar extends Component {
 
     render() {
         return (
-            /*<header>
-                <ul id="headerButtons">
-                    <li className="navButton"><Link to="">Home</Link></li>
-                    <li className="navButton"><Link to="/login">Login</Link></li>
-                    <li className="navButton"><Link to="/register">Register</Link></li>
-                    <li className="navButton"><Link to="/todolists">To do lists</Link></li>
-                </ul>
-            </header>*/
             <header>
                 <Navbar color="light" light expand="md">
                     <NavbarBrand href="/">To do list</NavbarBrand>

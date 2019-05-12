@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Link} from 'react-router-dom';
-//import { browserHistory } from 'react-router';
 import axios from 'axios';
 
 import HomePage from './components/HomePage';
