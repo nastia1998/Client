@@ -39,7 +39,7 @@ class TodoList extends Component {
 
     async loadData(listid) {
         const {data} = await axios.get(`https://localhost:44390/api/todolists/${listid}/tasks`)
-        this.setState({taskList: data})
+        this.setState({taskList: data, listId: listid})
     }
 
     updateInputName = event => {
