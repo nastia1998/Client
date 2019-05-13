@@ -5,6 +5,8 @@ import axios from "axios";
 import TaskList from './TaskList';
 import '../styles/TodoList.css'
 
+import shortid from 'shortid';
+
 class TodoList extends Component {
 
     constructor(props) {
@@ -14,56 +16,42 @@ class TodoList extends Component {
         this.state = {
             modal: false,
             listId: 0,
-            tasks: [],
+            taskList: [],
             nameVal: '',
             descrVal: ''
         };
 
-        this.toggle = this.toggle.bind(this);
-
-        this.toggleButton = this.toggleButton.bind(this);
-        this.updateInputName = this.updateInputName.bind(this);
-        this.updateInputDescr = this.updateInputDescr.bind(this);
-
-        this.deleteItem = this.deleteItem.bind(this);
+        this.loadData = this.loadData.bind(this);
+        this.addButton = this.addButton.bind(this);
     }
 
-    async componentDidMount() {
+    openModal = listId => {
 
-        try {
-            if (this.state.listId !== 0 && this.state.listId !== null && this.state.listId !== '') {
-                const {data} = await axios.get(`https://localhost:44390/api/todolists/${this.state.listId}/tasks`)
-                this.setState({tasks: data})
-            }
-        } catch (e) {
-            console.log(e)
-            this.setState({error: e.message})
+        this.setState((prevState) => ({
+             modal: !prevState.modal
+        }));
+        if(!this.state.modal) {
+            console.log('ggggggggggggg', listId)
+            this.loadData(listId)
         }
 
     }
 
-    toggle(event) {
-
-        this.setState({listId: event.target.id}, () => {
-            console.log('ty', this.state.listId)
-            this.componentDidMount()
-        })
-
-        this.setState((prevState) => ({
-            modal: !prevState.modal
-        }));
-
+    async loadData(listid) {
+        const {data} = await axios.get(`https://localhost:44390/api/todolists/${listid}/tasks`)
+        this.setState({taskList: data})
     }
 
-    updateInputName(event) {
+    updateInputName = event => {
         this.setState({nameVal: event.target.value})
     }
 
-    updateInputDescr(event) {
+    updateInputDescr = event => {
         this.setState({descrVal: event.target.value})
     }
 
-    async toggleButton(event) {
+    async addButton(event) {
+
         const value = {
             userId: 1,
             name: this.state.nameVal,
@@ -80,7 +68,7 @@ class TodoList extends Component {
         }
     }
 
-    deleteItem(event) {
+    deleteItem = event => {
         this.setState({listId: event.target.id}, () => {
             axios
                 .delete(`https://localhost:44390/api/todolists/${this.state.listId}`)
@@ -95,29 +83,43 @@ class TodoList extends Component {
         this.props.deleteList(event.target.id)
     }
 
+    addTaskList = data => {
+        this.setState(state => ({
+            taskList: [...state.taskList, data]
+        }))
+    }
+
+    deleteTaskList = id => {
+        const newTaskList = this.state.taskList.filter(item => item.id !== +id);
+
+        this.setState({
+            taskList: newTaskList
+        })
+    }
+
     render() {
         return (
             <div>
                 <div className="lists">
                     { this.props.todolists.map(c =>
                         <p key={c.id}>
-                            <Button onClick={this.toggle}>
+                            <Button onClick={() => this.openModal(c.id)}>
                                 <div id={c.id} name={c.name}> {c.id} {c.name} {c.description} </div>
                             </Button>
                             <Button outline id={c.id} color="danger" onClick={this.deleteItem}> X </Button>
                         </p>
                         )
                     }
-                    <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className} tasks={this.state.tasks}>
-                        <ModalHeader toggle={this.toggle}>Tasks</ModalHeader>
+                    <Modal isOpen={this.state.modal} toggle={this.openModal} className={this.props.className} tasks={this.state.taskList}>
+                        <ModalHeader toggle={this.openModal}>Tasks</ModalHeader>
                         <ModalBody>
                             <div>
-                                <TaskList listId={this.state.listId} tasks={this.state.tasks} />
+                                <TaskList addList={this.addTaskList} deleteList={this.deleteTaskList} listId={this.state.listId} tasks={this.state.taskList} />
                             </div>
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
-                            <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                            <Button color="primary" >Do Something</Button>{' '}
+                            <Button color="secondary" >Cancel</Button>
                         </ModalFooter>
                     </Modal>
                 </div>
@@ -125,7 +127,7 @@ class TodoList extends Component {
                 <div className="lists">
                     <label>Name</label> <input type="text" onChange={this.updateInputName} /><br />
                     <label>Description</label> <input type="text" onChange={this.updateInputDescr} /><br />
-                    <Button outline color="primary" onClick={this.toggleButton}>Add</Button>
+                    <Button outline color="primary" onClick={this.addButton}>Add</Button>
                 </div>
             </div>
         );
