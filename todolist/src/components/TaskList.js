@@ -3,41 +3,35 @@ import TaskItem from './TaskItem';
 import Moment from 'react-moment';
 import { Button } from 'reactstrap';
 import axios from "axios";
+import DatePicker from "react-datepicker";
+
+import "../styles/TodoList.css"
+
+import "react-datepicker/dist/react-datepicker.css";
 
 class TaskList extends Component {
+    state = {
+        nameVal: '',
+        dateComplVal: '',
+        dateRemVal: '',
+        listId: '',
+    }
 
-    constructor(props) {
-
-        super(props);
-
-        this.state = {
-            nameVal: '',
-            dateComplVal: '',
-            dateRemVal: '',
-            listId: ''
-        }
-
-        this.addButton = this.addButton.bind(this);
-        this.updateInputName = this.updateInputName.bind(this);
-        this.updateDateCompl = this.updateDateCompl.bind(this);
-        this.updateDateRem = this.updateDateRem.bind(this);
+    updateDateCompl = data => {
+        this.setState({dateComplVal: data}, () => console.log(this.state, data))
 
     }
 
-    updateDateCompl(event) {
+    updateInputName = (event) => {
         this.setState({nameVal: event.target.value})
     }
 
-    updateInputName(event) {
-        this.setState({dateComplVal: event.target.value})
-    }
-
-    updateDateRem(event) {
+    updateDateRem = (event) => {
         this.setState({dateRemVal: event.target.value})
     }
 
 
-    addButton(event) {
+    addButton = (event) => {
 
         axios
             .post(`https://localhost:44390/api/todolists/${this.state.listId}/tasks`, {
@@ -67,17 +61,24 @@ class TaskList extends Component {
                         <div key={item.id}>
                             <div>
                                 Name: {item.name}<br />
-                                Completed: <Moment parse="DD-MM-YYYY HH:mm">{item.dateCompletion}</Moment><br />
-                                Reminder:  <Moment parse="DD-MM-YYYY HH:mm">{item.dateReminder}</Moment><br />
+                                Completed: <Moment format="D.MM.YYYY hh:mm">{item.dateCompletion}</Moment><br />
+                                Reminder:  <Moment format="D.MM.YYYY hh:mm">{item.dateReminder}</Moment><br />
                                 <input type="checkbox" /><br />
                                 <hr />
                             </div>
                         </div>
                     )
                 })}
-                <label>Name</label> <input type="text" onChange={this.updateInputName} /><br />
-                <label>Completed</label> <input type="text" placeholder="yyyy-mm-dd" onChange={this.updateDateCompl} /><br />
-                <label>Reminder</label> <input type="text" placeholder="yyyy-mm-dd" onChange={this.updateDateRem} /><br />
+                <div className="container">
+                    <label className="label">Name</label> <input className="input" type="text" onChange={this.updateInputName} /><br />
+                </div>
+                <div className="container">
+                    <label>Completed</label> <DatePicker selected={this.state.dateComplVal} onChange={this.updateDateCompl}/><br />
+                </div>
+                <div className="container">
+                    <label>Reminder</label> <DatePicker selected={this.state.dateRemVal} onChange={this.updateDateRem}/><br />
+                </div>
+
                 <Button onClick={this.addButton}>Add</Button>
             </div>
         )

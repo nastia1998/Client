@@ -63,25 +63,24 @@ class TodoList extends Component {
         this.setState({descrVal: event.target.value})
     }
 
-    toggleButton(event) {
+    async toggleButton(event) {
+        const value = {
+            userId: 1,
+            name: this.state.nameVal,
+            description: this.state.descrVal
+        }
 
-        axios
-            .post("https://localhost:44390/api/todolists", {
-                userId: 1,
-                name: this.state.nameVal,
-                description: this.state.descrVal
-            })
-            .then(response => {
-                console.log(response)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+        try {
+            const { data } = await axios
+                .post("https://localhost:44390/api/todolists", value)
 
+            this.props.addList(data)
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     deleteItem(event) {
-
         this.setState({listId: event.target.id}, () => {
             axios
                 .delete(`https://localhost:44390/api/todolists/${this.state.listId}`)
@@ -93,6 +92,7 @@ class TodoList extends Component {
                 })
         })
 
+        this.props.deleteList(event.target.id)
     }
 
     render() {

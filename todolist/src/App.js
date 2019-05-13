@@ -27,6 +27,20 @@ class App extends Component{
 
     }
 
+    addTodoList = data => {
+        this.setState(state => ({
+            todoList: [...state.todoList, data]// записывает в массив все элементы текущего туду листа и в конец записываем новый туду лист
+        }))
+    }
+
+    deleteTodoList = id => {
+        const newTodoList = this.state.todoList.filter(item => item.id !== +id);
+
+        this.setState({
+            todoList: newTodoList
+        })
+    }
+
     render() {
         return (
             <Router>
@@ -37,7 +51,7 @@ class App extends Component{
                     <Route name='register' exact path='/register' component={Register} />
                     <Route name='todolists'
                            exact path='/todolists'
-                           render={(props) => <TodoList todolists={this.state.todoList} />} />
+                           render={(props) => <TodoList addList={this.addTodoList} deleteList={this.deleteTodoList} todolists={this.state.todoList} />} />
                 </div>
             </Router>
         );

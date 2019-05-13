@@ -2,3 +2,16 @@
     margin-left: 10px;
     margin-top: 10px;
 }
+
+.container {
+    display: flex;
+    width: 300px;
+}
+
+.label {
+    justify-content: flex-start;
+}
+
+.input {
+    justify-content: flex-end;
+}
