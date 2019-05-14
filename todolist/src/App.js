@@ -9,19 +9,33 @@ import Login from './components/Login';
 import Register from './components/Register';
 import TodoList from './components/TodoList';
 
+import { Redirect } from 'react-router-dom';
+
 class App extends Component{
 
     state = {
-        todoList: []
+        todoList: [],
+        loggedIn: false
     };
 
     async componentDidMount() {
 
         try {
-            const { data } = await axios.get("https://localhost:44390/api/todolists");
-            this.setState({todoList: data});
+            console.log('storage', localStorage.getItem('token'))
+            console.log('userId', localStorage.getItem('userId'))
+            if(localStorage.getItem('userId') !== null) {
+                const { data } = await axios.get(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} });
+                this.setState({todoList: data}, () => {
+                    console.log('loggedin', this.state.loggedIn)
+                });
+            } else {
+                //alert('You are not authorized!')
+            }
+
         } catch (e) {
             console.log(e)
+            localStorage.removeItem('token')
+            localStorage.removeItem('userId')
             this.setState({error: e.message})
         }
 
@@ -42,6 +56,7 @@ class App extends Component{
     }
 
     render() {
+
         return (
             <Router>
                 <div>
@@ -51,10 +66,10 @@ class App extends Component{
                     <Route name='register' exact path='/register' component={Register} />
                     <Route name='todolists'
                            exact path='/todolists'
-                           render={(props) => <TodoList addList={this.addTodoList} deleteList={this.deleteTodoList} todolists={this.state.todoList} />} />
+                           render={(props) => <TodoList addList={this.addTodoList} deleteList={this.deleteTodoList} todolists={this.state.todoList} loggedIn={!this.state.loggedIn} />} />
                 </div>
             </Router>
-        );
+        )
     }
 }
 

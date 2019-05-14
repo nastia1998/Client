@@ -6,7 +6,8 @@ import {
     NavbarBrand,
     Nav,
     NavItem,
-    NavLink
+    NavLink,
+    Button
 }
     from 'reactstrap';
 
@@ -27,6 +28,11 @@ class NavBar extends Component {
         });
     }
 
+    logOffClick = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+    }
+
     render() {
         return (
             <header>
@@ -45,6 +51,9 @@ class NavBar extends Component {
                             </NavItem>
                             <NavItem>
                                 <NavLink href="/todolists">To do lists</NavLink>
+                            </NavItem>
+                            <NavItem>
+                                <NavLink href='/' onClick={this.logOffClick}>Log Off</NavLink>
                             </NavItem>
                         </Nav>
                 </Navbar>

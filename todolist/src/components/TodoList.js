@@ -5,7 +5,8 @@ import axios from "axios";
 import TaskList from './TaskList';
 import '../styles/TodoList.css'
 
-import shortid from 'shortid';
+import { Redirect } from 'react-router-dom';
+
 
 class TodoList extends Component {
 
@@ -53,14 +54,14 @@ class TodoList extends Component {
     async addButton(event) {
 
         const value = {
-            userId: 1,
+            userId: localStorage.getItem('userId'),
             name: this.state.nameVal,
             description: this.state.descrVal
         }
 
         try {
             const { data } = await axios
-                .post("https://localhost:44390/api/todolists", value)
+                .post(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists`, value, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
 
             this.props.addList(data)
         } catch (e) {
@@ -71,7 +72,7 @@ class TodoList extends Component {
     deleteItem = event => {
         this.setState({listId: event.target.id}, () => {
             axios
-                .delete(`https://localhost:44390/api/todolists/${this.state.listId}`)
+                .delete(`https://localhost:44390/api/todolists/${this.state.listId}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
                 .then(response => {
                     console.log(response)
                 })
@@ -98,7 +99,9 @@ class TodoList extends Component {
     }
 
     render() {
-        return (
+        console.log('llll', this.props.loggedIn)
+        return this.props.loggedIn ?
+            (
             <div>
                 <div className="lists">
                     { this.props.todolists.map(c =>
@@ -130,7 +133,7 @@ class TodoList extends Component {
                     <Button outline color="primary" onClick={this.addButton}>Add</Button>
                 </div>
             </div>
-        );
+        ) : <Redirect to='/login'/> ;
     }
 }
 

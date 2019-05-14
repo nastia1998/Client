@@ -3,7 +3,6 @@ import Moment from 'react-moment';
 import { Button } from 'reactstrap';
 import axios from "axios";
 import DatePicker from "react-datepicker";
-import shortid from 'shortid';
 
 import "../styles/TodoList.css"
 
