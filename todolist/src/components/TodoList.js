@@ -28,9 +28,11 @@ class TodoList extends Component {
 
     openModal = listId => {
 
+
         this.setState((prevState) => ({
              modal: !prevState.modal
         }));
+
         if(!this.state.modal) {
             console.log('ggggggggggggg', listId)
             this.loadData(listId)
@@ -99,7 +101,7 @@ class TodoList extends Component {
     }
 
     render() {
-        console.log('llll', this.props.loggedIn)
+        console.log('llll', this.state.listId, "ListID")
         return this.props.loggedIn ?
             (
             <div>

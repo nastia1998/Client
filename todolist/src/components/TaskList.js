@@ -19,6 +19,7 @@ class TaskList extends Component {
             dateComplVal: '',
             dateRemVal: '',
             listId: '',
+            taskId: 0
         };
 
         this.addButton = this.addButton.bind(this);
@@ -30,7 +31,7 @@ class TaskList extends Component {
     }
 
     updateDateRem = date => {
-        this.setState({dateRemVal: date})
+        this.setState({dateRemVal: date}, () => console.log(1111111,this.state, date))
     }
 
     updateInputName = (event) => {
@@ -41,16 +42,19 @@ class TaskList extends Component {
 
         console.log('here',this.state.dateComplVal, this.state.dateRemVal)
         const value = {
-            todoListId: this.state.listId,
+            todoListId: this.props.listId,
             name: this.state.nameVal,
             dateCompletion: this.state.dateComplVal,
             dateReminder: this.state.dateRemVal
         }
 
+
+        console.log(2222, this.props.listId)
+
+
         try {
-            const { data } = axios
-                .post(`https://localhost:44390/api/todolists/${this.state.listId}/tasks`, value)
-                .then()
+            const { data } = await axios
+                .post(`https://localhost:44390/api/todolists/${this.props.listId}/tasks`, value)
 
             this.props.addList(data)
         } catch (e) {
@@ -59,11 +63,25 @@ class TaskList extends Component {
 
     }
 
-    componentDidMount() {
-        this.setState({listId: this.props.listId})
+    deleteItem = event => {
+        this.setState({taskId: event.target.id}, () => {
+            axios
+                .delete(`https://localhost:44390/api/todolists/${this.props.listId}/tasks/${this.state.taskId}`)
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        })
+
+        this.props.deleteList(event.target.id)
     }
 
     render() {
+
+        console.log(this.props.listId, 213123123123, this.state.listId)
+
         return(
             <div>
                 {/*{this.props.listId}<br />*/}
@@ -73,9 +91,9 @@ class TaskList extends Component {
                         <div key={item.id}>
                             <div>
                                 Name: {item.name}<br />
-                                Completed: <Moment format="D.MM.YYYY hh:mm">{item.dateCompletion}</Moment><br />
+                                Completed: <Moment format="D.MM.YYYY hh:mm">{item.dateCompletion}</Moment>
+                                <Button id={item.id} color="danger" onClick={this.deleteItem}>X</Button><br/>
                                 Reminder:  <Moment format="D.MM.YYYY hh:mm">{item.dateReminder}</Moment><br />
-                                <input type="checkbox" /><br />
                                 <hr />
                             </div>
                         </div>

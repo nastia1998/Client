@@ -21,8 +21,6 @@ class App extends Component{
     async componentDidMount() {
 
         try {
-            console.log('storage', localStorage.getItem('token'))
-            console.log('userId', localStorage.getItem('userId'))
             if(localStorage.getItem('userId') !== null) {
                 const { data } = await axios.get(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} });
                 this.setState({todoList: data}, () => {
@@ -66,7 +64,7 @@ class App extends Component{
                     <Route name='register' exact path='/register' component={Register} />
                     <Route name='todolists'
                            exact path='/todolists'
-                           render={(props) => <TodoList addList={this.addTodoList} deleteList={this.deleteTodoList} todolists={this.state.todoList} loggedIn={!this.state.loggedIn} />} />
+                           render={(props) => <TodoList addList={this.addTodoList} deleteList={this.deleteTodoList} todolists={this.state.todoList} loggedIn={!this.state.loggedIn}/>} />
                 </div>
             </Router>
         )
