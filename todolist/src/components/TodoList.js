@@ -74,7 +74,7 @@ class TodoList extends Component {
     deleteItem = event => {
         this.setState({listId: event.target.id}, () => {
             axios
-                .delete(`https://localhost:44390/api/todolists/${this.state.listId}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
+                .delete(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists/${this.state.listId}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
                 .then(response => {
                     console.log(response)
                 })
