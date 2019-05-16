@@ -26,6 +26,12 @@ class TodoList extends Component {
         this.addButton = this.addButton.bind(this);
     }
 
+    componentDidMount(){
+        /*const {data} = axios.get(`https://localhost:44390/api/todolists/${listid}/tasks`)
+        this.setState({taskList: data, listId: listid})*/
+    }
+
+
     openModal = listId => {
 
 
@@ -41,7 +47,7 @@ class TodoList extends Component {
     }
 
     async loadData(listid) {
-        const {data} = await axios.get(`https://localhost:44390/api/todolists/${listid}/tasks`)
+       const {data} = await axios.get(`https://localhost:44390/api/todolists/${listid}/tasks`)
         this.setState({taskList: data, listId: listid})
     }
 

@@ -15,7 +15,8 @@ class App extends Component{
 
     state = {
         todoList: [],
-        loggedIn: false
+        loggedIn: false,
+        //todoListId: 0
     };
 
     async componentDidMount() {
@@ -25,6 +26,7 @@ class App extends Component{
                 const { data } = await axios.get(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} });
                 this.setState({todoList: data}, () => {
                     console.log('loggedin', this.state.loggedIn)
+                    console.log('qwerty', data)
                 });
             } else {
                 //alert('You are not authorized!')

@@ -19,6 +19,8 @@ class Register extends Component {
 
     async handleSubmit(e) {
 
+        e.preventDefault();
+
         const body = {
             login: this.state.login,
             password: this.state.password,

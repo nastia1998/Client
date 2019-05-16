@@ -39,11 +39,13 @@ class Login extends Component {
                 this.setState({logged: true}, () => {
                     localStorage.setItem('token', this.state.token)
                     localStorage.setItem('userId', data.id)
+                    localStorage.setItem('email', data.email)
                 })
                 localStorage.setItem('token', data.token)
                 console.log('toooo', localStorage.getItem('token'))
                 localStorage.setItem('userId', data.id)
                 console.log('useeee', localStorage.getItem('userId'))
+                this.props.history.push("/todolists")
             } else {
                 this.setState({error: true})
                 alert('Did not authorize')
