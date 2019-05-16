@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import {
+    Button,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    ListGroup,
+    ListGroupItem,
+    Container,
+    Row,
+    Col,
+    Input,
+    Form, FormGroup, Label
+} from 'reactstrap';
 import axios from "axios";
 
 import TaskList from './TaskList';
 import '../styles/TodoList.css'
 
 import { Redirect } from 'react-router-dom';
-
 
 class TodoList extends Component {
 
@@ -29,7 +41,6 @@ class TodoList extends Component {
             localStorage.removeItem('token')
             localStorage.removeItem('userId')
         }
-
     }
 
     addTodoList = async(event) => {
@@ -55,6 +66,7 @@ class TodoList extends Component {
 
     deleteTodoList = event => {
         this.setState({listId: event.target.id}, () => {
+            console.log('sjfs', event)
             axios
                 .delete(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists/${this.state.listId}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
                 .then(response => {
@@ -76,7 +88,6 @@ class TodoList extends Component {
         })
     }
 
-
     openModal = listId => {
 
         this.setState((prevState) => ({
@@ -84,8 +95,7 @@ class TodoList extends Component {
         }));
 
         if(!this.state.modal) {
-            console.log('ggggggggggggg', listId)
-            this.loadData(listId)
+            //this.loadData(listId)
         }
 
     }
@@ -122,35 +132,53 @@ class TodoList extends Component {
         return this.props.loggedIn ?
             (
             <div>
-                <div className="lists">
-                    { this.state.todoList.map(c =>
-                        <p key={c.id}>
-                            <Button onClick={() => this.openModal(c.id)}>
-                                <div id={c.id} name={c.name}> {c.id} {c.name} {c.description} </div>
-                            </Button>
-                            <Button outline id={c.id} color="danger" onClick={this.deleteTodoList}> X </Button>
-                        </p>
-                        )
-                    }
-                    <Modal isOpen={this.state.modal} toggle={this.openModal} className={this.props.className} tasks={this.state.taskList}>
-                        <ModalHeader toggle={this.openModal}>Tasks</ModalHeader>
-                        <ModalBody>
-                            <div>
-                                <TaskList addList={this.addTaskList} deleteList={this.deleteTaskList} listId={this.state.listId} tasks={this.state.taskList} />
-                            </div>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="primary" >Do Something</Button>{' '}
-                            <Button color="secondary" >Cancel</Button>
-                        </ModalFooter>
-                    </Modal>
-                </div>
+                {this.state.todoList.map(item =>
+                    <Container key={item.id} className="todo">
+                        <ListGroup>
+                            <Row>
+                                <Col xs="auto">
+                                    <ListGroupItem key={item.id} tag="button" onClick={()=>this.openModal(item.id)}>{item.name} | {item.description}</ListGroupItem>
+                                </Col>
+                                <Button id={item.id} color="danger" onClick={this.deleteTodoList} close>x</Button>
+                            </Row>
+                        </ListGroup>
+                    </Container>
+                )}
+                <Modal isOpen={this.state.modal} toggle={this.openModal} className={this.props.className} tasks={this.state.taskList}>
+                    <ModalHeader toggle={this.openModal}>Tasks</ModalHeader>
+                    <ModalBody>
+                        <div>
+                            <TaskList listId={this.state.listId} />
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="primary" >Do Something</Button>{' '}
+                        <Button color="secondary" >Cancel</Button>
+                    </ModalFooter>
+                </Modal>
                 <hr />
-                <div className="lists">
-                    <label>Name</label> <input type="text" onChange={this.updateInputName} /><br />
-                    <label>Description</label> <input type="text" onChange={this.updateInputDescr} /><br />
-                    <Button outline color="primary" onClick={this.addTodoList}>Add</Button>
-                </div>
+                <Container>
+                    <Form onSubmit={this.handleSubmit}>
+                        <FormGroup row>
+                            <Label for="Name" sm={7}>Name</Label>
+                            <Col sm={10}>
+                                <Input type="text" name="name" id="Name" onChange={this.updateInputName} required />
+                            </Col>
+                        </FormGroup>
+                        <FormGroup row>
+                            <Label for="Description" sm={7}>Description</Label>
+                            <Col sm={10}>
+                                <Input type="text" name="description" id="Description" onChange={this.updateInputDescr} required />
+                            </Col>
+                        </FormGroup>
+                        <FormGroup check row>
+                            <Col sm={{ size: 10, offset: 2 }}>
+                                <Button onClick={this.addTodoList}>Add</Button>
+                            </Col>
+                        </FormGroup>
+                    </Form>
+                </Container>
+
             </div>
         ) : <Redirect to='/login'/> ;
     }
