@@ -10,30 +10,74 @@ import { Redirect } from 'react-router-dom';
 
 class TodoList extends Component {
 
-    constructor(props) {
+    state = {
+        modal: false,
+        listId: 0,
+        taskList: [],
+        nameVal: '',
+        descrVal: '',
+        todoList: []
+    };
 
-        super(props);
+    async componentDidMount(){
+        try {
+            if(localStorage.getItem('userId') !== null) {
+                const { data } = await axios.get(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} });
+                this.setState({todoList: data});
+            }
+        } catch (e) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('userId')
+        }
 
-        this.state = {
-            modal: false,
-            listId: 0,
-            taskList: [],
-            nameVal: '',
-            descrVal: ''
-        };
-
-        this.loadData = this.loadData.bind(this);
-        this.addButton = this.addButton.bind(this);
     }
 
-    componentDidMount(){
-        /*const {data} = axios.get(`https://localhost:44390/api/todolists/${listid}/tasks`)
-        this.setState({taskList: data, listId: listid})*/
+    addTodoList = async(event) => {
+
+        const value = {
+            userId: localStorage.getItem('userId'),
+            name: this.state.nameVal,
+            description: this.state.descrVal
+        }
+
+        try {
+            const { data } = await axios
+                .post(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists`, value, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
+
+            this.setState(state => ({
+                todoList: [...state.todoList, data]// записывает в массив все элементы текущего туду листа и в конец записываем новый туду лист
+            }))
+
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    deleteTodoList = event => {
+        this.setState({listId: event.target.id}, () => {
+            axios
+                .delete(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists/${this.state.listId}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
+                .then(response => {
+                    console.log(response)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        })
+
+        this.updateTodoList(event.target.id)
+    }
+
+    updateTodoList = id => {
+        const newTodoList = this.state.todoList.filter(item => item.id !== +id);
+
+        this.setState({
+            todoList: newTodoList
+        })
     }
 
 
     openModal = listId => {
-
 
         this.setState((prevState) => ({
              modal: !prevState.modal
@@ -46,7 +90,7 @@ class TodoList extends Component {
 
     }
 
-    async loadData(listid) {
+    loadData = async (listid) => {
        const {data} = await axios.get(`https://localhost:44390/api/todolists/${listid}/tasks`)
         this.setState({taskList: data, listId: listid})
     }
@@ -57,39 +101,6 @@ class TodoList extends Component {
 
     updateInputDescr = event => {
         this.setState({descrVal: event.target.value})
-    }
-
-    async addButton(event) {
-
-        const value = {
-            userId: localStorage.getItem('userId'),
-            name: this.state.nameVal,
-            description: this.state.descrVal
-        }
-
-        try {
-            const { data } = await axios
-                .post(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists`, value, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
-
-            this.props.addList(data)
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
-    deleteItem = event => {
-        this.setState({listId: event.target.id}, () => {
-            axios
-                .delete(`https://localhost:44390/api/users/${localStorage.getItem('userId')}/todolists/${this.state.listId}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('token')}`} })
-                .then(response => {
-                    console.log(response)
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-        })
-
-        this.props.deleteList(event.target.id)
     }
 
     addTaskList = data => {
@@ -112,12 +123,12 @@ class TodoList extends Component {
             (
             <div>
                 <div className="lists">
-                    { this.props.todolists.map(c =>
+                    { this.state.todoList.map(c =>
                         <p key={c.id}>
                             <Button onClick={() => this.openModal(c.id)}>
                                 <div id={c.id} name={c.name}> {c.id} {c.name} {c.description} </div>
                             </Button>
-                            <Button outline id={c.id} color="danger" onClick={this.deleteItem}> X </Button>
+                            <Button outline id={c.id} color="danger" onClick={this.deleteTodoList}> X </Button>
                         </p>
                         )
                     }
@@ -138,7 +149,7 @@ class TodoList extends Component {
                 <div className="lists">
                     <label>Name</label> <input type="text" onChange={this.updateInputName} /><br />
                     <label>Description</label> <input type="text" onChange={this.updateInputDescr} /><br />
-                    <Button outline color="primary" onClick={this.addButton}>Add</Button>
+                    <Button outline color="primary" onClick={this.addTodoList}>Add</Button>
                 </div>
             </div>
         ) : <Redirect to='/login'/> ;
