@@ -13,10 +13,8 @@
     text-align: center;
 }
 
-.label {
-    justify-content: flex-start;
+.test {
+    margin-left: 195px;
+
 }
 
-.input {
-    justify-content: flex-end;
-}

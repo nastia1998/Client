@@ -4,20 +4,13 @@ import axios from 'axios';
 
 class Register extends Component {
 
-    constructor(props) {
-
-        super(props);
-
-        this.state = {
-            login: '',
-            password: '',
-            email: ''
-        }
-
-        this.handleSubmit = this.handleSubmit.bind(this);
+    state = {
+        login: '',
+        password: '',
+        email: ''
     }
 
-    async handleSubmit(e) {
+    handleSubmit = async (e) => {
 
         e.preventDefault();
 
@@ -26,11 +19,12 @@ class Register extends Component {
             password: this.state.password,
             email: this.state.email
         }
+        console.log(body)
 
         try {
 
-            const { data } = await axios.post("https://localhost:44390/api/auth/register", body);
-            if (data) alert('Your registration completed successfully!')
+            await axios.post("https://todolistweb20190517052233.azurewebsites.net/api/auth/register", body);
+            this.props.history.push("/login")
 
         } catch (e) {
             console.log(e)
@@ -46,9 +40,11 @@ class Register extends Component {
                 break;
             case 'password':
                 this.setState({password: e.target.value})
+                break
             case 'email':
                 this.setState({email: e.target.value})
-
+                break
+            default: break
         }
 
     }
@@ -56,7 +52,6 @@ class Register extends Component {
     render() {
         return (
             <div>
-                Register page
                 <Container>
                     <Form onSubmit={this.handleSubmit} method="post">
                         <FormGroup row>

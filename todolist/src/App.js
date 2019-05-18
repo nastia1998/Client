@@ -10,10 +10,6 @@ import TodoList from './components/TodoList';
 
 class App extends Component{
 
-    state = {
-        loggedIn: false
-    };
-
     render() {
 
         return (
@@ -25,7 +21,7 @@ class App extends Component{
                     <Route name='register' exact path='/register' component={Register} />
                     <Route name='todolists'
                            exact path='/todolists'
-                           render={(props) => <TodoList loggedIn={!this.state.loggedIn}/>} />
+                           render={(props) => <TodoList/>} />
                 </div>
             </Router>
         )

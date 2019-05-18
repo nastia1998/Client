@@ -1,28 +1,17 @@
 import React, { Component } from 'react';
-import { Col, Button, Form, FormGroup, Label, Input, Container } from 'reactstrap';
+import { Col, Button, Form, FormGroup, Label, Input, Container} from 'reactstrap';
 import axios from "axios";
-
-import { Redirect } from 'react-router-dom';
 
 class Login extends Component {
 
-    constructor(props) {
-
-        super(props);
-
-        this.state = {
-            login: '',
-            password: '',
-            token: '',
-            logged: false,
-            error: false
-        }
-
-        this.handleSubmit = this.handleSubmit.bind(this);
-
+    state = {
+        login: '',
+        password: '',
+        token: '',
+        error: false
     }
 
-    async handleSubmit(e) {
+    handleSubmit = async (e) => {
 
         e.preventDefault();
 
@@ -32,28 +21,21 @@ class Login extends Component {
         }
 
         try {
-            console.log(this.state.login, this.state.password)
-            const { data } = await axios.post("https://localhost:44390/api/auth/authenticate", body);
+            const { data } = await axios.post("https://todolistweb20190517052233.azurewebsites.net/api/auth/authenticate", body);
             if (data.token) {
-                console.log('datatoken')
-                this.setState({logged: true}, () => {
-                    localStorage.setItem('token', this.state.token)
-                    localStorage.setItem('userId', data.id)
-                    localStorage.setItem('email', data.email)
-                })
                 localStorage.setItem('token', data.token)
-                console.log('toooo', localStorage.getItem('token'))
                 localStorage.setItem('userId', data.id)
-                console.log('useeee', localStorage.getItem('userId'))
+                localStorage.setItem('loggedIn', 'loggedIn')
+                localStorage.setItem('email', data.email)
                 this.props.history.push("/todolists")
+
             } else {
                 this.setState({error: true})
-                alert('Did not authorize')
             }
 
         } catch (e) {
             console.log(e)
-            alert(e.message)
+            alert('Authorization failed. Check your input values!')
         }
 
     }
@@ -62,25 +44,21 @@ class Login extends Component {
 
         switch(e.target.type) {
             case 'text':
-                this.setState({login: e.target.value}, () => {
-                    console.log(this.state.login)
-                })
+                this.setState({login: e.target.value})
+                break
 
             case 'password':
-                this.setState({password: e.target.value}, () => {
-                    console.log(this.state.password)
-                })
+                this.setState({password: e.target.value})
+                break
+
+            default: break;
         }
 
     }
 
     render() {
-        if (this.state.loggedIn) {
-            return <Redirect to='/todolists' />
-        }
-        return  (
+        return (
             <div>
-                Login page
                 <Container>
                     <Form method="post" onSubmit={this.handleSubmit}>
                         <FormGroup row>
@@ -104,6 +82,7 @@ class Login extends Component {
                 </Container>
             </div>
         )
-    }
+        }
+
 }
 export default Login;

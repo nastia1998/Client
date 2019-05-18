@@ -7,18 +7,13 @@ import {
     Nav,
     NavItem,
     NavLink,
-    Button
 }
     from 'reactstrap';
 
 class NavBar extends Component {
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            isOpen: false
-        };
+    state = {
+        isOpen: false
     }
 
     toggle = () =>{
@@ -30,6 +25,7 @@ class NavBar extends Component {
     logOffClick = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
+        localStorage.removeItem('loggedIn')
     }
 
     render() {
